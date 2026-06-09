@@ -1,572 +1,87 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Joseph 70.3" />
-  <meta name="theme-color" content="#0b1020" />
-  <title>Joseph 70.3 Command Center v2</title>
-  <style>
-    :root{
-      --bg:#070b16;--card:#10182b;--card2:#16213a;--text:#f6f8ff;--muted:#a9b4cc;
-      --accent:#ff6b35;--accent2:#41d6c3;--good:#3ee27f;--warn:#ffd166;--bad:#ff4d6d;
-      --line:rgba(255,255,255,.09);--shadow:0 18px 50px rgba(0,0,0,.35);
-      --radius:22px;
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;background:linear-gradient(180deg,#050711 0%,#0b1020 50%,#070b16 100%);color:var(--text);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;}
-    body{min-height:100svh;padding: env(safe-area-inset-top) 14px calc(92px + env(safe-area-inset-bottom));}
-    .app{max-width:520px;margin:0 auto;}
-    header{position:sticky;top:0;z-index:5;padding:12px 0 10px;background:linear-gradient(180deg,#070b16 72%,rgba(7,11,22,0));backdrop-filter:blur(8px)}
-    .top{display:flex;align-items:center;gap:12px}
-    .logo{width:50px;height:50px;border-radius:16px;background:radial-gradient(circle at 35% 25%,#ffb703,#ff6b35 45%,#7b2cbf 100%);
-      display:grid;place-items:center;font-size:28px;box-shadow:var(--shadow)}
-    h1{font-size:22px;margin:0;line-height:1.1}
-    .subtitle{color:var(--muted);font-size:13px;margin-top:3px}
-    .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:rgba(255,255,255,.04);font-size:12px;color:var(--muted)}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025));border:1px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);margin:10px 0}
-    .hero{padding:16px;background:
-      radial-gradient(circle at 20% 10%,rgba(255,107,53,.35),transparent 38%),
-      radial-gradient(circle at 90% 30%,rgba(65,214,195,.18),transparent 36%),
-      linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.025));}
-    .kicker{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
-    .big{font-size:36px;font-weight:800;letter-spacing:-.04em;margin:2px 0}
-    .small{font-size:13px;color:var(--muted)}
-    .metric{min-height:92px}
-    .metric .value{font-size:24px;font-weight:800;margin-top:6px}
-    .metric .label{font-size:12px;color:var(--muted)}
-    button,input,select,textarea{font:inherit}
-    button{border:0;border-radius:16px;padding:12px 14px;color:var(--text);background:var(--card2);font-weight:700}
-    button.primary{background:linear-gradient(135deg,var(--accent),#ff9f1c);color:#1b0b02}
-    button.ghost{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--text)}
-    button.warn{background:rgba(255,209,102,.16);border:1px solid rgba(255,209,102,.3)}
-    button.bad{background:rgba(255,77,109,.16);border:1px solid rgba(255,77,109,.3)}
-    .row{display:flex;gap:10px;align-items:center}
-    .row.wrap{flex-wrap:wrap}
-    .row.between{justify-content:space-between}
-    input,select,textarea{width:100%;border:1px solid var(--line);background:rgba(255,255,255,.055);color:var(--text);border-radius:14px;padding:11px 12px;outline:none}
-    textarea{min-height:70px;resize:vertical}
-    label{font-size:12px;color:var(--muted);display:block;margin:8px 0 5px}
-    .tabs{position:fixed;bottom:0;left:0;right:0;z-index:10;background:rgba(7,11,22,.86);backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
-    .tabbar{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-    .tab{padding:8px 4px;border-radius:14px;text-align:center;font-size:11px;color:var(--muted);background:transparent}
-    .tab.active{background:rgba(255,255,255,.08);color:var(--text)}
-    .tab span{display:block;font-size:19px;margin-bottom:2px}
-    .view{display:none}
-    .view.active{display:block}
-    .workout{border:1px solid var(--line);border-radius:18px;padding:12px;margin:10px 0;background:rgba(255,255,255,.035)}
-    .workout.done{opacity:.68;border-color:rgba(62,226,127,.42)}
-    .type{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
-    .swim{color:#44c2ff}.bike{color:#41d6c3}.run{color:#ffd166}.lift{color:#ff6b35}.pt{color:#b8f7a1}.rest{color:#d0d7e8}
-    .title{font-size:17px;font-weight:800;margin:4px 0}
-    .desc{color:var(--muted);font-size:13px;line-height:1.35}
-    .progress{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:8px}
-    .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:999px;transition:.25s}
-    .check{width:24px;height:24px;border-radius:8px;border:1px solid var(--line);display:grid;place-items:center;background:rgba(255,255,255,.06);flex:none}
-    .done .check{background:rgba(62,226,127,.18);border-color:rgba(62,226,127,.55)}
-    .note{border-left:3px solid var(--accent);padding:10px 12px;background:rgba(255,107,53,.08);border-radius:12px;color:#ffe3d6;font-size:13px;line-height:1.35}
-    .danger{border-left-color:var(--bad);background:rgba(255,77,109,.09);color:#ffd5dd}
-    .goodnote{border-left-color:var(--good);background:rgba(62,226,127,.09);color:#d9ffe7}
-    .mini{font-size:11px;color:var(--muted)}
-    .split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .hidden{display:none!important}
-    .tag{font-size:11px;padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.07);color:var(--muted);display:inline-flex}
-    .todayBadge{font-size:12px;color:#111;background:var(--accent2);padding:5px 8px;border-radius:999px;font-weight:800}
-    .footerSpace{height:20px}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Joseph 70.3">
+<title>Joseph 70.3 Command Center v4</title>
+<style>
+:root{--bg:#070b16;--card:#10182b;--line:rgba(255,255,255,.12);--text:#f8f9ff;--muted:#aeb8cf;--orange:#ff6b35;--teal:#45e0c7;--blue:#51b7ff;--yellow:#ffd166;--green:#48e67d;--red:#ff4d6d}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#060916,#0b1020);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;padding:12px 13px 92px}.app{max-width:560px;margin:auto}
+header{position:sticky;top:0;background:linear-gradient(180deg,#060916 70%,transparent);z-index:5;padding:10px 0}.top{display:flex;gap:12px;align-items:center}.logo{width:50px;height:50px;border-radius:16px;display:grid;place-items:center;font-size:28px;background:radial-gradient(circle at 30% 20%,#ffd166,#ff6b35 48%,#7b2cff)}h1{font-size:21px;margin:0}.sub,.small,.desc{color:var(--muted);font-size:13px;line-height:1.35}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));border:1px solid var(--line);border-radius:22px;padding:14px;margin:10px 0;box-shadow:0 16px 46px rgba(0,0,0,.35)}.hero{background:radial-gradient(circle at 15% 5%,rgba(255,107,53,.32),transparent 35%),radial-gradient(circle at 90% 10%,rgba(69,224,199,.18),transparent 35%),rgba(255,255,255,.04)}
+.kicker{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:800}.big{font-size:36px;font-weight:900;letter-spacing:-.045em}.row{display:flex;gap:10px;align-items:center}.between{justify-content:space-between}.wrap{flex-wrap:wrap}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button,input,select,textarea{font:inherit}button{border:0;border-radius:15px;padding:11px 12px;background:#14213d;color:var(--text);font-weight:800}button.primary{background:linear-gradient(135deg,var(--orange),#ffb703);color:#1d0d04}button.ghost{border:1px solid var(--line);background:rgba(255,255,255,.055)}button.bad{background:rgba(255,77,109,.16);border:1px solid rgba(255,77,109,.35)}button.mini{padding:7px 9px;border-radius:12px;font-size:12px}
+input,select,textarea{width:100%;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--text);border-radius:14px;padding:11px 12px;outline:0}textarea{min-height:70px}label{font-size:12px;color:var(--muted);display:block;margin:8px 0 5px}
+.tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(6,9,22,.9);backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:8px}.tabbar{max-width:560px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.tab{text-align:center;border-radius:14px;padding:8px 2px;color:var(--muted);font-size:11px}.tab span{display:block;font-size:19px}.tab.active{background:rgba(255,255,255,.09);color:var(--text)}
+.view{display:none}.view.active{display:block}.pill{padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.07);font-size:11px;color:var(--muted);border:1px solid var(--line)}
+.workout{border:1px solid var(--line);border-radius:18px;padding:12px;margin:10px 0;background:rgba(255,255,255,.04)}.workout.done{opacity:.66;border-color:rgba(72,230,125,.5)}.type{font-size:11px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}.Swim{color:var(--blue)}.Bike{color:var(--teal)}.Run{color:var(--yellow)}.Lift{color:var(--orange)}.PT{color:#b7ff91}.Rest{color:#d5d9e8}.title{font-size:17px;font-weight:900;margin:3px 0}.check{width:25px;height:25px;border:1px solid var(--line);border-radius:8px;display:grid;place-items:center;flex:none;background:rgba(255,255,255,.06)}.done .check{background:rgba(72,230,125,.18)}
+.note{border-left:3px solid var(--orange);background:rgba(255,107,53,.09);border-radius:12px;padding:10px 12px;font-size:13px;color:#ffe0d1;line-height:1.35}.note.red{border-color:var(--red);background:rgba(255,77,109,.10);color:#ffd8df}.progress{height:10px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}.bar{height:100%;background:linear-gradient(90deg,var(--teal),var(--orange));width:0}.metric .val{font-size:24px;font-weight:900;margin-top:5px}.metric .lab{font-size:12px;color:var(--muted)}
+.dayHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.today{background:var(--teal);color:#041311;border-radius:999px;font-weight:900;font-size:11px;padding:5px 8px}.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}.muted{color:var(--muted)}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.calday{min-height:75px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,255,.035);padding:6px;font-size:11px;cursor:pointer}.calday.selected{outline:2px solid var(--teal);background:rgba(69,224,199,.09)}.calday.todayCell{border-color:rgba(255,107,53,.65)}.calnum{font-weight:900}.dot{width:7px;height:7px;border-radius:99px;display:inline-block;margin:2px}.dot.Swim{background:var(--blue)}.dot.Bike{background:var(--teal)}.dot.Run{background:var(--yellow)}.dot.Lift{background:var(--orange)}.dot.PT{background:#b7ff91}.weekStrip{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.weekDay{border:1px solid var(--line);border-radius:14px;padding:9px 4px;text-align:center;background:rgba(255,255,255,.04)}.weekDay.selected{outline:2px solid var(--teal)}
+</style>
 </head>
-<body>
-<div class="app">
-  <header>
-    <div class="top">
-      <div class="logo">🐕</div>
-      <div>
-        <h1>Joseph 70.3 Command Center</h1>
-        <div class="subtitle">NC 70.3 build • adaptive • local-save</div>
-      </div>
-    </div>
-  </header>
+<body><div class="app">
+<header><div class="top"><div class="logo">🐕</div><div><h1>Joseph 70.3 Command Center</h1><div class="sub">v4 • tappable calendar • weekly view</div></div></div></header>
 
-  <main>
-    <section id="home" class="view active">
-      <div class="card hero">
-        <div class="row between">
-          <div>
-            <div class="kicker">Today</div>
-            <div class="big" id="todayName">Loading</div>
-            <div class="small" id="raceCountdown">Race countdown loading...</div>
-          </div>
-          <div class="todayBadge" id="readinessBadge">READY</div>
-        </div>
-        <div class="progress"><div class="bar" id="weekBar"></div></div>
-        <div class="small" style="margin-top:8px" id="weekSummary">0/0 sessions complete</div>
-      </div>
+<section id="home" class="view active">
+<div class="card hero"><div class="row between"><div><div class="kicker">Today</div><div class="big" id="todayName"></div><div class="small" id="countdown"></div></div><div class="pill" id="readiness">READY</div></div><div class="progress" style="margin-top:12px"><div class="bar" id="weekBar"></div></div><div class="small" id="weekLine" style="margin-top:7px"></div></div>
+<div class="card"><div class="kicker">Chaos Buttons</div><div class="small">Use only when true. The plan adjusts without guilt.</div><div class="grid" style="margin-top:10px"><button class="ghost" onclick="flag('pool')">🏊 Pool closed</button><button class="ghost" onclick="flag('knee')">🦵 Knee weird</button><button class="ghost" onclick="flag('longday')">🥤 Long work day</button><button class="ghost" onclick="flag('sleep')">😵 Bad sleep</button></div><div id="advice" class="note" style="margin-top:10px"></div></div>
+<div class="card"><div class="row between"><div><div class="kicker">Today's Workouts</div><div class="small">Rearrange in Plan tab if life changes.</div></div><button class="primary" onclick="show('plan')">Plan</button></div><div id="todayList"></div></div>
+<div class="grid"><div class="card metric"><div class="lab">Swim week</div><div class="val" id="swimW">0</div><div class="small">yd</div></div><div class="card metric"><div class="lab">Bike week</div><div class="val" id="bikeW">0</div><div class="small">mi</div></div><div class="card metric"><div class="lab">Run week</div><div class="val" id="runW">0</div><div class="small">mi</div></div><div class="card metric"><div class="lab">PT compliance</div><div class="val" id="ptW">0/2</div><div class="small">minimum</div></div></div>
+</section>
 
-      <div class="card">
-        <div class="row between">
-          <div>
-            <div class="kicker">Coach Adjustments</div>
-            <div class="small">Tap what’s true today. The plan swaps automatically.</div>
-          </div>
-        </div>
-        <div class="grid" style="margin-top:10px">
-          <button class="ghost" onclick="toggleFlag('poolClosed')">🏊 Pool closed</button>
-          <button class="ghost" onclick="toggleFlag('kneeAngry')">🦵 Knee angry</button>
-          <button class="ghost" onclick="toggleFlag('longWork')">🥤 Long work day</button>
-          <button class="ghost" onclick="toggleFlag('sleptBad')">😵 Bad sleep</button>
-        </div>
-        <div id="flagAdvice" class="note" style="margin-top:12px">No chaos selected. Execute normally, dawg.</div>
-      </div>
+<section id="plan" class="view"><div class="card"><div class="row between"><div><div class="kicker">Rearrangeable Plan</div><div class="small">Move workouts up/down or send to another day.</div></div><button class="primary" onclick="addWorkout()">+ Add</button></div></div><div id="planList"></div></section>
 
-      <div class="card">
-        <div class="row between">
-          <div>
-            <div class="kicker">Today's Work</div>
-            <div class="small" id="todayFocus">Adaptive plan</div>
-          </div>
-          <button class="primary" onclick="showTab('plan')">Open Plan</button>
-        </div>
-        <div id="todayWorkouts"></div>
-      </div>
+<section id="calendar" class="view">
+<div class="card"><div class="row between"><button class="ghost" onclick="monthShift(-1)">←</button><div><div class="kicker" id="monthTitle"></div><div class="small">Tap a date to view that day’s workouts.</div></div><button class="ghost" onclick="monthShift(1)">→</button></div></div>
+<div class="card"><div class="calgrid" id="calHead"></div><div class="calgrid" id="calendarGrid"></div></div>
+<div class="card"><div class="row between"><div><div class="kicker" id="selectedTitle"></div><div class="small" id="selectedSub"></div></div><button class="ghost" onclick="goSelectedWeek()">Week View</button></div><div id="selectedWorkouts"></div></div>
+<div class="card"><div class="row between"><button class="ghost" onclick="weekShift(-1)">← week</button><div><div class="kicker" id="weekTitle"></div><div class="small">See the whole plan for the selected week.</div></div><button class="ghost" onclick="weekShift(1)">week →</button></div><div class="weekStrip" id="weekStrip" style="margin-top:12px"></div><div id="weekView"></div></div>
+</section>
 
-      <div class="grid">
-        <div class="card metric">
-          <div class="label">Swim this week</div>
-          <div class="value" id="swimWeek">0 yd</div>
-          <div class="mini">Goal: 2–4 swims</div>
-        </div>
-        <div class="card metric">
-          <div class="label">Bike this week</div>
-          <div class="value" id="bikeWeek">0 mi</div>
-          <div class="mini">Long bike is king</div>
-        </div>
-        <div class="card metric">
-          <div class="label">Run this week</div>
-          <div class="value" id="runWeek">0 mi</div>
-          <div class="mini">Maintain the weapon</div>
-        </div>
-        <div class="card metric">
-          <div class="label">Lift parts hit</div>
-          <div class="value" id="liftParts">0/5</div>
-          <div class="mini">Target each part 3x/wk</div>
-        </div>
-      </div>
-    </section>
+<section id="log" class="view">
+<div class="card"><div class="kicker">Log Actual Workout</div><div class="note">Garmin auto-connect is not possible from this standalone HTML app. Manual logging stays clean and fast.</div><div class="split"><div><label>Sport</label><select id="sport"><option>Run</option><option>Bike</option><option>Swim</option><option>Lift</option><option>PT</option><option>Rest</option></select></div><div><label>Date</label><input id="date" type="date"></div></div><div class="split"><div><label>Distance / yardage</label><input id="dist" type="number" step="0.01" placeholder="mi or yd"></div><div><label>Minutes</label><input id="mins" type="number" step="1"></div></div><div class="split"><div><label>Avg HR</label><input id="hr" type="number"></div><div><label>RPE</label><input id="rpe" type="number" min="1" max="10"></div></div><label>Notes</label><textarea id="notes" placeholder="Evo SL dawg mode, knee fine, calves cramped..."></textarea><button class="primary" style="width:100%;margin-top:10px" onclick="saveLog()">Save</button></div>
+<div class="card"><div class="kicker">Recent Logs</div><div id="logs"></div></div>
+</section>
 
-    <section id="plan" class="view">
-      <div class="card">
-        <div class="row between">
-          <div>
-            <div class="kicker">Weekly Plan</div>
-            <div class="small">Built around weekends off, Mon/Thu long days.</div>
-          </div>
-          <button class="warn" onclick="resetWeek()">Reset Week</button>
-        </div>
-      </div>
-      <div id="weekPlan"></div>
-    </section>
+<section id="stats" class="view"><div class="card hero"><div class="kicker">Evidence-Based Unhinged Status</div><div class="big" id="status"></div><div class="small" id="statusWhy"></div></div><div class="grid"><div class="card metric"><div class="lab">Longest swim</div><div class="val" id="lswim"></div><div class="small">yd</div></div><div class="card metric"><div class="lab">Longest bike</div><div class="val" id="lbike"></div><div class="small">mi</div></div><div class="card metric"><div class="lab">Longest run</div><div class="val" id="lrun"></div><div class="small">mi</div></div><div class="card metric"><div class="lab">Longest ride</div><div class="val" id="ltime"></div><div class="small">min</div></div></div><div class="card"><div class="kicker">PR Board</div><div class="workout"><b>5K:</b> 25:34</div><div class="workout"><b>10K:</b> 53:03</div><div class="workout"><b>Bike proof:</b> 17.2 mph aerobic</div><div class="workout"><b>Swim proof:</b> continuous graph getting smoother</div></div></section>
 
-    <section id="log" class="view">
-      <div class="card">
-        <div class="kicker">Garmin Paste Importer</div>
-        <div class="small">Paste stats from Garmin/Strava screenshot text. It grabs distance, time, pace/speed, HR, calories, elevation, and notes.</div>
-        <label>Sport</label>
-        <select id="importSport">
-          <option>Run</option><option>Bike</option><option>Swim</option><option>Lift</option><option>PT</option>
-        </select>
-        <label>Paste stats</label>
-        <textarea id="garminPaste" placeholder="Example: Distance 20.73 mi&#10;Total Time 1:12:22&#10;Avg Speed 17.2 mph&#10;Avg Heart Rate 138 bpm"></textarea>
-        <button class="primary" style="width:100%;margin-top:10px" onclick="importGarmin()">Import into log</button>
-        <div id="importPreview" class="note goodnote" style="margin-top:10px;display:none"></div>
-      </div>
-
-      <div class="card">
-        <div class="kicker">Log Workout</div>
-        <div class="small">Enter what you actually did. Circumstantial chaos is expected.</div>
-        <div class="split">
-          <div><label>Sport</label><select id="logSport">
-            <option>Swim</option><option>Bike</option><option>Run</option><option>Lift</option><option>PT</option><option>Rest</option>
-          </select></div>
-          <div><label>Date</label><input id="logDate" type="date"></div>
-        </div>
-        <div class="split">
-          <div><label>Distance / Yardage</label><input id="logDistance" type="number" step="0.01" placeholder="mi or yd"></div>
-          <div><label>Minutes</label><input id="logMinutes" type="number" step="1" placeholder="time"></div>
-        </div>
-        <div class="split">
-          <div><label>Avg HR</label><input id="logHR" type="number" placeholder="optional"></div>
-          <div><label>RPE 1-10</label><input id="logRPE" type="number" min="1" max="10" placeholder="optional"></div>
-        </div>
-        <div id="liftInputs" class="hidden">
-          <label>Lift parts hit</label>
-          <div class="row wrap">
-            <button class="ghost partBtn" data-part="Push" onclick="togglePart(event)">Push</button>
-            <button class="ghost partBtn" data-part="Pull" onclick="togglePart(event)">Pull</button>
-            <button class="ghost partBtn" data-part="Legs" onclick="togglePart(event)">Legs</button>
-            <button class="ghost partBtn" data-part="Core" onclick="togglePart(event)">Core</button>
-            <button class="ghost partBtn" data-part="Hips/PT" onclick="togglePart(event)">Hips/PT</button>
-          </div>
-        </div>
-        <label>Notes</label><textarea id="logNotes" placeholder="knee? calves? ass? fueling? shoe propaganda?"></textarea>
-        <button class="primary" style="width:100%;margin-top:10px" onclick="saveLog()">Save workout</button>
-      </div>
-      <div class="card">
-        <div class="kicker">Recent Logs</div>
-        <div id="recentLogs"></div>
-      </div>
-    </section>
-
-    <section id="stats" class="view">
-      <div class="card hero">
-        <div class="kicker">Evidence Board</div>
-        <div class="big" id="dawgStatus">DAWG</div>
-        <div class="small" id="dawgReason">Based on actual completed work, not imaginary coach points.</div>
-      </div>
-      <div class="grid">
-        <div class="card metric"><div class="label">Longest swim</div><div class="value" id="longSwim">0 yd</div><div class="mini">Goal: 2112 yd race-ish</div></div>
-        <div class="card metric"><div class="label">Longest bike</div><div class="value" id="longBike">0 mi</div><div class="mini">Goal: 56 mi</div></div>
-        <div class="card metric"><div class="label">Longest run</div><div class="value" id="longRun">0 mi</div><div class="mini">Goal: 13.1 mi</div></div>
-        <div class="card metric"><div class="label">Longest ride time</div><div class="value" id="longBikeMin">0m</div><div class="mini">Saddle tolerance</div></div>
-      </div>
-      <div class="card">
-        <div class="kicker">PR Board</div>
-        <div class="workout"><div class="row between"><span>5K</span><strong>25:34</strong></div></div>
-        <div class="workout"><div class="row between"><span>10K</span><strong>55:10</strong></div></div>
-        <div class="workout"><div class="row between"><span>Bike avg proof</span><strong>17.2 mph @ ~138 HR</strong></div></div>
-        <div class="workout"><div class="row between"><span>Swim proof</span><strong>~1300y / smoother graph</strong></div></div>
-      </div>
-    </section>
-
-    <section id="settings" class="view">
-      <div class="card">
-        <div class="kicker">Settings</div>
-        <label>Race date</label><input id="raceDate" type="date">
-        <label>Current block note</label><textarea id="blockNote">Early 70.3 build: swim consistency, bike volume, run maintenance, PT hips, lift smart.</textarea>
-        <button class="primary" style="width:100%;margin-top:10px" onclick="saveSettings()">Save settings</button>
-      </div>
-      <div class="card">
-        <div class="kicker">Install Help</div>
-        <div class="desc">
-          Best option: upload this HTML to this GitHub Pages repo, open that link in Safari, then Share → Add to Home Screen.
-          iPhone often blocks local HTML files from installing cleanly.
-        </div>
-      </div>
-      <div class="card">
-        <div class="kicker">Danger Zone</div>
-        <button class="bad" style="width:100%" onclick="wipeData()">Wipe saved app data</button>
-      </div>
-    </section>
-  </main>
+<nav class="tabs"><div class="tabbar"><div class="tab active" onclick="show('home')"><span>🏠</span>Home</div><div class="tab" onclick="show('plan')"><span>📋</span>Plan</div><div class="tab" onclick="show('calendar')"><span>📅</span>Cal</div><div class="tab" onclick="show('log')"><span>➕</span>Log</div><div class="tab" onclick="show('stats')"><span>📈</span>Stats</div></div></nav>
 </div>
-
-<nav class="tabs">
-  <div class="tabbar">
-    <div class="tab active" onclick="showTab('home')"><span>🏠</span>Home</div>
-    <div class="tab" onclick="showTab('plan')"><span>📅</span>Plan</div>
-    <div class="tab" onclick="showTab('log')"><span>➕</span>Log</div>
-    <div class="tab" onclick="showTab('stats')"><span>📈</span>Stats</div>
-    <div class="tab" onclick="showTab('settings')"><span>⚙️</span>Set</div>
-  </div>
-</nav>
-
 <script>
-const KEY='joseph703_v1';
-const todayISO=()=>new Date().toISOString().slice(0,10);
-const dayNames=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-
-const defaultState={
-  settings:{raceDate:'2026-10-17', blockNote:'Early 70.3 build: swim consistency, bike volume, run maintenance, PT hips, lift smart.'},
-  flags:{poolClosed:false,kneeAngry:false,longWork:false,sleptBad:false},
-  done:{},
-  logs:[
-    {date:'2026-06-01',sport:'Run',distance:6.21,minutes:55,notes:'10K PR 55:10',parts:[]},
-    {date:'2026-06-01',sport:'Bike',distance:20.7,minutes:72,hr:138,notes:'17.2 mph aerobic ride',parts:[]},
-    {date:'2026-06-01',sport:'Swim',distance:1300,minutes:31,notes:'Smoother continuous swim graph',parts:[]}
-  ]
-};
-
+const KEY='joseph703_v4',days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],todayISO=()=>new Date().toISOString().slice(0,10);
+function w(type,title,target,details){return{id:String(Math.random()).slice(2),type,title,target,details}}
+const defaultState={flags:{pool:false,knee:false,longday:false,sleep:false},monthOffset:0,weekOffset:0,selectedDate:todayISO(),done:{},logs:[{date:todayISO(),sport:'Run',dist:6.23,mins:53,hr:148,notes:'10K PR 53:03'},{date:todayISO(),sport:'Bike',dist:20.7,mins:72,hr:138,notes:'17.2 mph aerobic road ride'},{date:todayISO(),sport:'Swim',dist:1300,mins:31,notes:'Smoother continuous swim'}],plan:{Monday:[w('Lift','Strength A','Push + Pull + Core','45–60 min. Controlled volume, no failure. Track parts hit.'),w('Run','Easy run','3–5 mi easy','If swampy, ignore pace. If knee weird, swap to bike/spin.')],Tuesday:[w('Bike','Bike quality / steady','Outdoor: 60–75 min steady. Trainer: 45–60 min with 3 x 8 min steady.','Cadence 80–90. HR controlled. Fuel if >60 min.'),w('PT','Home PT','20 min knee/hip routine','Ball wall press, step-downs, lateral step-downs, high knee drives, band heel press, balance, RDL reach, A-skips, bridges.')],Wednesday:[w('Swim','Swim technique + continuous','30–45 min','Warmup bubbles. 2 fist drills, 2 fingertip drag, continuous relaxed swim. Kick less.'),w('Lift','Strength B','Legs + Hips/PT + Core','PT-style legs. No ego. Knee tracking over load.')],Thursday:[w('Bike','Easy bike / trainer','Outdoor: 45–60 min easy. Trainer: 45–75 min easy spin.','This is allowed to be easy. YouTube ride counts if cadence is smooth.'),w('Run','Short easy run','3–4 mi easy or strides','Only if legs feel normal. Skip if work/life cooked you.')],Friday:[w('Lift','Strength C','Push + Pull + Legs/Core','Hit missing parts. Keep soreness low before weekend.'),w('PT','Home PT','20 min knee/hip routine','Same routine. This is the insurance policy.'),w('Brick','Brick session','Bike 45–60 + Run 10–20 min','Bike easy/moderate. Run first mile controlled. No hero transition.')],Saturday:[w('Bike','Long bike','25–35 mi for current block','Outdoor preferred. Trainer if weather. Fuel 40–80g carbs/hr. Goal: saddle time + smooth cadence.')],Sunday:[w('Run','Long-ish run','7–9 mi current block','Build gradually. Not marathon brain. Effort > pace in humidity.'),w('Swim','Optional recovery swim','20–40 min relaxed','Only if pool available and shoulders feel good.')]}}
 let state=load();
-let selectedParts=[];
-
-function load(){
-  try{return {...defaultState,...JSON.parse(localStorage.getItem(KEY)||'{}')}}
-  catch(e){return structuredClone(defaultState)}
-}
-function save(){localStorage.setItem(KEY,JSON.stringify(state));render();}
-function fmt(n,dec=0){return Number(n||0).toFixed(dec).replace(/\.0$/,'')}
-function getWeekStart(d=new Date()){
-  const x=new Date(d); const day=x.getDay(); const diff=(day+6)%7; x.setDate(x.getDate()-diff); x.setHours(0,0,0,0); return x;
-}
-function inThisWeek(dateStr){
-  const d=new Date(dateStr+'T00:00:00'); const s=getWeekStart(); const e=new Date(s); e.setDate(e.getDate()+7);
-  return d>=s && d<e;
-}
-
-const basePlan={
-  Monday:[
-    {id:'monLift',type:'Lift',title:'Upper / light full body',desc:'Long work day. Keep it clean: Push + Pull + Core, no grinder sets.'},
-    {id:'monSwim',type:'Swim',title:'Recovery swim 20–30 min',desc:'Breathing rhythm + smoothness. If pool closed: mobility/PT instead.'}
-  ],
-  Tuesday:[
-    {id:'tueLift',type:'Lift',title:'Lift: Push/Pull + hips',desc:'Hit parts without wrecking legs.'},
-    {id:'tueBike',type:'Bike',title:'Bike 45–75 min',desc:'Cadence 80–90 RPM. HR controlled. Optional 5–10 min brick jog only if knee is quiet.'}
-  ],
-  Wednesday:[
-    {id:'wedLift',type:'Lift',title:'Lift: legs controlled + core',desc:'PT-style legs. No ego squats. Leave the knee happier than you found it.'},
-    {id:'wedRun',type:'Run',title:'Run 4–7 easy/moderate mi',desc:'Run maintenance. If humid: effort > pace. If knee angry: bike or swim swap.'}
-  ],
-  Thursday:[
-    {id:'thuMob',type:'PT',title:'PT hips + mobility',desc:'Long work day. Hip/glute work, A-skip practice, knee tracking.'},
-    {id:'thuSwim',type:'Swim',title:'Easy swim 20–40 min',desc:'Grease the groove. Fist drill + fingertip drag + continuous relaxed work.'}
-  ],
-  Friday:[
-    {id:'friLift',type:'Lift',title:'Lift: upper + core',desc:'Keep it satisfying but not destructive.'},
-    {id:'friBrick',type:'Bike',title:'Brick: bike 45–60 + run 10–20',desc:'Easy bike, quick transition, easy run. First mile controlled.'}
-  ],
-  Saturday:[
-    {id:'satLongBike',type:'Bike',title:'Long bike 25–30 mi',desc:'Main endurance session. Fuel 40–80g carbs/hr. Cadence smooth. Do not race the app.'}
-  ],
-  Sunday:[
-    {id:'sunSwim',type:'Swim',title:'Swim 30–45 min',desc:'Continuous focus. Fewer spikes. Less kicking. Reset only when form breaks.'},
-    {id:'sunRun',type:'Run',title:'Optional easy run 3–6 mi',desc:'Only if legs/knee feel normal. Otherwise walk, PT, or recovery spin.'}
-  ]
-};
-
-function adjusted(w){
-  let arr=JSON.parse(JSON.stringify(basePlan[w]));
-  if(state.flags.poolClosed){
-    arr=arr.map(x=> x.type==='Swim'?{...x,type:'Bike',title:'Pool closed swap: easy bike/spin 30–60 min',desc:'No panic. Pool closed is not slacking. Replace swim with low-stress aerobic or PT.'}:x);
-  }
-  if(state.flags.kneeAngry){
-    arr=arr.map(x=>{
-      if(x.type==='Run') return {...x,type:'Swim',title:'Knee angry swap: swim or recovery bike',desc:'No impact today. Protect the knee. If pool closed too, do easy trainer + PT.'};
-      if(x.title.includes('Brick')) return {...x,title:'Bike only: skip brick run',desc:'Knee angry. Keep cadence high, resistance low, no run off bike.'};
-      return x;
-    });
-  }
-  if(state.flags.longWork || state.flags.sleptBad){
-    arr=arr.map(x=>{
-      if(x.type==='Lift') return {...x,title:x.title+' (reduced)',desc:'Half volume. No failure. You are not proving masculinity to dumbbells.'};
-      if(x.type==='Bike'||x.type==='Run') return {...x,desc:x.desc+' If cooked, cap at easy 30–45 min.'};
-      return x;
-    });
-  }
-  return arr;
-}
-
-function showTab(id){
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  [...document.querySelectorAll('.tab')].find(t=>t.textContent.toLowerCase().includes(id==='home'?'home':id==='plan'?'plan':id==='log'?'log':id==='stats'?'stats':'set')).classList.add('active');
-  render();
-}
-
-function typeClass(t){return String(t).toLowerCase().split('/')[0]}
-function workoutHTML(day,w){
-  const done=!!state.done[w.id];
-  return `<div class="workout ${done?'done':''}" onclick="toggleDone('${w.id}')">
-    <div class="row">
-      <div class="check">${done?'✓':''}</div>
-      <div style="flex:1">
-        <div class="type ${typeClass(w.type)}">${w.type}</div>
-        <div class="title">${w.title}</div>
-        <div class="desc">${w.desc}</div>
-      </div>
-    </div>
-  </div>`;
-}
-function toggleDone(id){state.done[id]=!state.done[id]; save();}
-function toggleFlag(k){state.flags[k]=!state.flags[k]; save();}
-function resetWeek(){ if(confirm('Reset workout checkmarks for this week?')){state.done={}; save();}}
-
-function renderPlan(){
-  const wrap=document.getElementById('weekPlan'); wrap.innerHTML='';
-  dayNames.slice(1).concat('Sunday').forEach(day=>{
-    const card=document.createElement('div'); card.className='card';
-    const isToday=day===dayNames[new Date().getDay()];
-    card.innerHTML=`<div class="row between"><div><div class="kicker">${day}</div><div class="small">${isToday?'Today, coach.':''}</div></div>${isToday?'<span class="todayBadge">TODAY</span>':''}</div>`;
-    adjusted(day).forEach(w=>card.innerHTML+=workoutHTML(day,w));
-    wrap.appendChild(card);
-  });
-}
-
-function renderHome(){
-  const day=dayNames[new Date().getDay()];
-  document.getElementById('todayName').textContent=day;
-  const rd=new Date(state.settings.raceDate+'T00:00:00');
-  const diff=Math.ceil((rd-new Date())/86400000);
-  document.getElementById('raceCountdown').textContent= diff>=0 ? `${diff} days until NC 70.3` : 'Race date passed — update settings.';
-  const todays=adjusted(day);
-  document.getElementById('todayFocus').textContent=state.settings.blockNote||'Adaptive plan';
-  document.getElementById('todayWorkouts').innerHTML=todays.map(w=>workoutHTML(day,w)).join('') || '<div class="note">No planned work. Recover like it counts.</div>';
-  const all=Object.values(basePlan).flat();
-  const complete=all.filter(w=>state.done[w.id]).length;
-  document.getElementById('weekBar').style.width=(100*complete/all.length)+'%';
-  document.getElementById('weekSummary').textContent=`${complete}/${all.length} planned sessions checked off`;
-
-  const logs=state.logs.filter(x=>inThisWeek(x.date));
-  const swim=logs.filter(x=>x.sport==='Swim').reduce((a,b)=>a+Number(b.distance||0),0);
-  const bike=logs.filter(x=>x.sport==='Bike').reduce((a,b)=>a+Number(b.distance||0),0);
-  const run=logs.filter(x=>x.sport==='Run').reduce((a,b)=>a+Number(b.distance||0),0);
-  document.getElementById('swimWeek').textContent=`${fmt(swim)} yd`;
-  document.getElementById('bikeWeek').textContent=`${fmt(bike,1)} mi`;
-  document.getElementById('runWeek').textContent=`${fmt(run,1)} mi`;
-
-  const parts=['Push','Pull','Legs','Core','Hips/PT'];
-  const counts={}; parts.forEach(p=>counts[p]=0);
-  logs.filter(x=>x.sport==='Lift').forEach(x=>(x.parts||[]).forEach(p=>counts[p]=(counts[p]||0)+1));
-  const hit=parts.filter(p=>counts[p]>=3).length;
-  document.getElementById('liftParts').textContent=`${hit}/5`;
-  renderFlagAdvice();
-}
-
-function renderFlagAdvice(){
-  const f=state.flags; let cls='note', msg='No chaos selected. Execute normally, dawg.';
-  if(f.poolClosed) msg='Pool closed: swim becomes easy bike, PT, or mobility. Not slacking. Circumstance swap.';
-  if(f.kneeAngry){cls='note danger'; msg='Knee angry: no impact hero behavior. Replace runs with swim/easy bike/PT.';}
-  if(f.longWork) msg='Long work day: reduce volume. Coke cooler already stole recovery points.';
-  if(f.sleptBad) msg='Bad sleep: cap intensity. Today is consistency, not proving a point.';
-  if(f.poolClosed && f.kneeAngry){cls='note danger'; msg='Pool closed + knee angry: easy trainer spin + PT only. Survive the chaos intelligently.';}
-  const el=document.getElementById('flagAdvice'); el.className=cls; el.textContent=msg;
-  const bad=f.kneeAngry||f.sleptBad; document.getElementById('readinessBadge').textContent=bad?'ADJUST':'READY';
-}
-
-function renderLogs(){
-  const recent=[...state.logs].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
-  document.getElementById('recentLogs').innerHTML=recent.map((l,i)=>`
-    <div class="workout">
-      <div class="row between"><div><span class="type ${typeClass(l.sport)}">${l.sport}</span> <strong>${l.date}</strong></div><button class="ghost" onclick="deleteLog(${state.logs.indexOf(l)})">Delete</button></div>
-      <div class="desc">${l.distance?l.distance+(l.sport==='Swim'?' yd':' mi'):''} ${l.minutes?`• ${l.minutes} min`:''} ${l.hr?`• HR ${l.hr}`:''} ${l.rpe?`• RPE ${l.rpe}`:''}</div>
-      ${l.parts&&l.parts.length?`<div class="mini">Parts: ${l.parts.join(', ')}</div>`:''}
-      ${l.notes?`<div class="mini">${l.notes}</div>`:''}
-    </div>`).join('') || '<div class="note">No logs yet. Start stacking evidence.</div>';
-}
-
-function renderStats(){
-  const swim=Math.max(0,...state.logs.filter(x=>x.sport==='Swim').map(x=>Number(x.distance||0)));
-  const bike=Math.max(0,...state.logs.filter(x=>x.sport==='Bike').map(x=>Number(x.distance||0)));
-  const run=Math.max(0,...state.logs.filter(x=>x.sport==='Run').map(x=>Number(x.distance||0)));
-  const bmin=Math.max(0,...state.logs.filter(x=>x.sport==='Bike').map(x=>Number(x.minutes||0)));
-  document.getElementById('longSwim').textContent=`${fmt(swim)} yd`;
-  document.getElementById('longBike').textContent=`${fmt(bike,1)} mi`;
-  document.getElementById('longRun').textContent=`${fmt(run,1)} mi`;
-  document.getElementById('longBikeMin').textContent=`${fmt(bmin)}m`;
-  let score=0, reasons=[];
-  if(swim>=1300){score++; reasons.push('swim is no longer panic-only');}
-  if(bike>=20){score++; reasons.push('20+ mile bike proven');}
-  if(run>=6.2){score++; reasons.push('10K fitness alive');}
-  if(bmin>=90){score++; reasons.push('saddle time adapting');}
-  document.getElementById('dawgStatus').textContent=score>=3?'CERTIFIED DAWG':score>=2?'DAWG IN PROGRESS':'BUILDING THE DAWG';
-  document.getElementById('dawgReason').textContent=reasons.length?reasons.join(' • '):'Log workouts to build the evidence board.';
-}
-
-function renderSettings(){
-  document.getElementById('raceDate').value=state.settings.raceDate;
-  document.getElementById('blockNote').value=state.settings.blockNote||'';
-}
-
-function saveSettings(){
-  state.settings.raceDate=document.getElementById('raceDate').value||state.settings.raceDate;
-  state.settings.blockNote=document.getElementById('blockNote').value;
-  save();
-}
-
-document.getElementById('logSport').addEventListener('change',e=>{
-  document.getElementById('liftInputs').classList.toggle('hidden',e.target.value!=='Lift');
-});
-document.getElementById('logDate').value=todayISO();
-
-function togglePart(e){
-  e.preventDefault();
-  const p=e.currentTarget.dataset.part;
-  if(selectedParts.includes(p)) selectedParts=selectedParts.filter(x=>x!==p); else selectedParts.push(p);
-  document.querySelectorAll('.partBtn').forEach(b=>b.style.outline=selectedParts.includes(b.dataset.part)?'2px solid var(--accent2)':'none');
-}
-function saveLog(){
-  const sport=document.getElementById('logSport').value;
-  state.logs.push({
-    date:document.getElementById('logDate').value||todayISO(),
-    sport,
-    distance:Number(document.getElementById('logDistance').value||0),
-    minutes:Number(document.getElementById('logMinutes').value||0),
-    hr:Number(document.getElementById('logHR').value||0)||undefined,
-    rpe:Number(document.getElementById('logRPE').value||0)||undefined,
-    notes:document.getElementById('logNotes').value,
-    parts:sport==='Lift'?[...selectedParts]:[]
-  });
-  ['logDistance','logMinutes','logHR','logRPE','logNotes'].forEach(id=>document.getElementById(id).value='');
-  selectedParts=[]; document.querySelectorAll('.partBtn').forEach(b=>b.style.outline='none');
-  save(); showTab('home');
-}
-function deleteLog(i){ if(confirm('Delete this log?')){state.logs.splice(i,1); save();}}
-function wipeData(){ if(confirm('Wipe all saved app data?')){localStorage.removeItem(KEY); state=structuredClone(defaultState); render();}}
-
-
-function parseTimeToMinutes(t){
-  if(!t) return 0;
-  const parts=t.trim().split(':').map(Number);
-  if(parts.length===3) return Math.round(parts[0]*60+parts[1]+parts[2]/60);
-  if(parts.length===2) return Math.round(parts[0]+parts[1]/60);
-  return Number(t)||0;
-}
-function firstMatch(text, patterns){
-  for(const p of patterns){
-    const m=text.match(p);
-    if(m) return m[1];
-  }
-  return '';
-}
-function importGarmin(){
-  const text=document.getElementById('garminPaste').value || '';
-  const sport=document.getElementById('importSport').value;
-  const lower=text.toLowerCase();
-
-  let distance='';
-  if(sport==='Swim'){
-    distance=firstMatch(text,[/Distance\s*([\d,.]+)\s*yd/i,/([\d,.]+)\s*yd/i,/Distance\s*([\d,.]+)\s*m\b/i]);
-  } else {
-    distance=firstMatch(text,[/Distance\s*([\d,.]+)\s*mi/i,/([\d,.]+)\s*mi\b/i]);
-  }
-
-  let time=firstMatch(text,[
-    /Moving Time\s*([0-9:]+)/i,
-    /Total Time\s*([0-9:]+)/i,
-    /Elapsed Time\s*([0-9:]+)/i,
-    /\b([0-9]+:[0-9]{2}:[0-9]{2})\b/,
-    /\b([0-9]{1,2}:[0-9]{2})\b/
-  ]);
-
-  let hr=firstMatch(text,[/Avg Heart Rate\s*([\d.]+)\s*bpm/i,/Average\s*([\d.]+)\s*bpm/i,/([\d.]+)\s*bpm/i]);
-  let calories=firstMatch(text,[/Active Calories\s*([\d,.]+)/i,/Calories\s*([\d,.]+)\s*Cal/i,/Total Calories Burned\s*([\d,.]+)/i]);
-  let pace=firstMatch(text,[/Avg Pace\s*([0-9:]+)\s*\/mi/i,/Avg Pace\s*([0-9:]+)\s*\/100yd/i,/Pace\s*([0-9:]+)/i]);
-  let speed=firstMatch(text,[/Avg Speed\s*([\d.]+)\s*mph/i,/Avg Moving Speed\s*([\d.]+)\s*mph/i]);
-  let elev=firstMatch(text,[/Elevation Gain\s*([\d,.]+)\s*ft/i,/Total Ascent\s*([\d,.]+)\s*ft/i]);
-
-  document.getElementById('logSport').value=sport;
-  document.getElementById('liftInputs').classList.toggle('hidden',sport!=='Lift');
-  document.getElementById('logDate').value=todayISO();
-  document.getElementById('logDistance').value=(distance||'').replace(/,/g,'');
-  document.getElementById('logMinutes').value=parseTimeToMinutes(time);
-  document.getElementById('logHR').value=hr||'';
-  const noteBits=[];
-  if(pace) noteBits.push('Pace '+pace);
-  if(speed) noteBits.push('Speed '+speed+' mph');
-  if(calories) noteBits.push('Calories '+calories);
-  if(elev) noteBits.push('Elev '+elev+' ft');
-  document.getElementById('logNotes').value=noteBits.join(' • ');
-  const preview=document.getElementById('importPreview');
-  preview.style.display='block';
-  preview.textContent=`Imported: ${sport} ${distance||'?'} ${sport==='Swim'?'yd':'mi'} • ${time||'?'} • HR ${hr||'?'}${pace?' • pace '+pace:''}${speed?' • speed '+speed+' mph':''}`;
-  showTab('log');
-}
-
-function render(){renderHome(); renderPlan(); renderLogs(); renderStats(); renderSettings();}
-render();
-</script>
-</body>
-</html>
+function load(){try{let s=JSON.parse(localStorage.getItem(KEY)||'{}');return{...defaultState,...s,flags:{...defaultState.flags,...(s.flags||{})},plan:s.plan||defaultState.plan,logs:s.logs||defaultState.logs}}catch(e){return JSON.parse(JSON.stringify(defaultState))}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));render()}
+function show(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));[...document.querySelectorAll('.tab')].find(t=>t.textContent.toLowerCase().includes(id==='calendar'?'cal':id)).classList.add('active');render()}
+function flag(k){state.flags[k]=!state.flags[k];save()}
+function cls(t){return t==='Brick'?'Bike':t}
+function adjusted(x){let y={...x};if(state.flags.pool&&y.type==='Swim'){y.type='Bike';y.title='Pool closed swap';y.target='Easy bike/trainer 30–60 min or PT';y.details='Pool being fixed is not slacking. Swap intelligently.'}if(state.flags.knee&&(y.type==='Run'||y.type==='Brick')){y.type='Bike';y.title='Knee weird swap';y.target='Easy bike or swim, no run impact';y.details='Protect the knee. Keep cadence high, resistance low.'}if(state.flags.longday||state.flags.sleep)y.details+=' Reduce volume 25–50% today. Consistency > proving a point.';return y}
+function workoutHTML(day,x,i,controls=true){x=adjusted(x);let done=state.done[x.id];return `<div class="workout ${done?'done':''}"><div class="row"><div class="check" onclick="toggleDone('${x.id}')">${done?'✓':''}</div><div style="flex:1"><div class="row between"><div class="type ${cls(x.type)}">${x.type}</div>${controls?`<div class="row"><button class="mini ghost" onclick="move('${day}',${i},-1)">↑</button><button class="mini ghost" onclick="move('${day}',${i},1)">↓</button></div>`:''}</div><div class="title">${x.title}</div><div class="desc"><b>${x.target}</b><br>${x.details}</div>${controls?`<div class="row wrap" style="margin-top:8px"><button class="mini ghost" onclick="sendDay('${day}',${i},-1)">← day</button><button class="mini ghost" onclick="sendDay('${day}',${i},1)">day →</button><button class="mini bad" onclick="delW('${day}',${i})">delete</button></div>`:''}</div></div></div>`}
+function toggleDone(id){state.done[id]=!state.done[id];save()}
+function move(day,i,d){let a=state.plan[day],j=i+d;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];save()}
+function sendDay(day,i,d){let di=days.indexOf(day),nd=days[(di+d+7)%7],item=state.plan[day].splice(i,1)[0];state.plan[nd].push(item);save()}
+function delW(day,i){if(confirm('Delete workout?')){state.plan[day].splice(i,1);save()}}
+function addWorkout(){let day=prompt('Day? Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday','Monday');if(!state.plan[day])return alert('Use full day name.');let type=prompt('Type? Swim, Bike, Run, Lift, PT, Brick, Rest','Bike')||'Bike';let title=prompt('Title','Custom workout')||'Custom workout';let target=prompt('Target','30–60 min easy')||'';let details=prompt('Details','Keep it controlled.')||'';state.plan[day].push(w(type,title,target,details));save()}
+function weekStart(d=new Date()){let x=new Date(d);let diff=(x.getDay()+6)%7;x.setDate(x.getDate()-diff);x.setHours(0,0,0,0);return x}
+function thisWeek(s){let d=new Date(s+'T00:00:00'),a=weekStart(),b=new Date(a);b.setDate(b.getDate()+7);return d>=a&&d<b}
+function renderHome(){let d=days[new Date().getDay()];todayName.textContent=d;let race=new Date('2026-10-17T00:00:00'),diff=Math.ceil((race-new Date())/86400000);countdown.textContent=diff+' days until Ironman 70.3 NC';let all=Object.values(state.plan).flat(),done=all.filter(x=>state.done[x.id]).length;weekBar.style.width=(done/all.length*100)+'%';weekLine.textContent=`${done}/${all.length} planned sessions checked`;todayList.innerHTML=(state.plan[d]||[]).map((x,i)=>workoutHTML(d,x,i)).join('');let l=state.logs.filter(x=>thisWeek(x.date)),sum=s=>l.filter(x=>x.sport===s).reduce((a,b)=>a+Number(b.dist||0),0);swimW.textContent=Math.round(sum('Swim'));bikeW.textContent=sum('Bike').toFixed(1).replace('.0','');runW.textContent=sum('Run').toFixed(1).replace('.0','');ptW.textContent=`${l.filter(x=>x.sport==='PT').length}/2`;let msg='No chaos. Execute normally.',c='note';if(state.flags.pool)msg='Pool closed: swap swim to bike/PT. You are adapting, not slacking.';if(state.flags.knee){msg='Knee weird: no run impact. Bike/swim/PT only.';c='note red'}if(state.flags.longday)msg='Long work day: reduce volume. Work counts as load.';if(state.flags.sleep)msg='Bad sleep: no intensity. Keep the streak alive softly.';advice.className=c;advice.textContent=msg;readiness.textContent=(state.flags.knee||state.flags.sleep)?'ADJUST':'READY'}
+function renderPlan(){planList.innerHTML=days.map(day=>`<div class="card"><div class="dayHead"><div><div class="kicker">${day}</div><div class="small">${(state.plan[day]||[]).length} workouts</div></div>${day===days[new Date().getDay()]?'<span class="today">TODAY</span>':''}</div>${(state.plan[day]||[]).map((x,i)=>workoutHTML(day,x,i,true)).join('')}</div>`).join('')}
+function dateISO(d){return d.toISOString().slice(0,10)}
+function selectDate(iso){state.selectedDate=iso;save()}
+function monthShift(n){state.monthOffset+=n;save()}
+function weekShift(n){state.weekOffset+=n;save()}
+function goSelectedWeek(){let sd=new Date(state.selectedDate+'T00:00:00'),now=weekStart(),sel=weekStart(sd);state.weekOffset=Math.round((sel-now)/604800000);save()}
+function renderCalendar(){let now=new Date(),m=new Date(now.getFullYear(),now.getMonth()+state.monthOffset,1);monthTitle.textContent=m.toLocaleString('default',{month:'long',year:'numeric'});calHead.innerHTML=['S','M','T','W','T','F','S'].map(x=>`<div class="muted" style="text-align:center">${x}</div>`).join('');let start=m.getDay(),daysIn=new Date(m.getFullYear(),m.getMonth()+1,0).getDate(),html='';for(let i=0;i<start;i++)html+='<div></div>';for(let n=1;n<=daysIn;n++){let dd=new Date(m.getFullYear(),m.getMonth(),n),day=days[dd.getDay()],iso=dateISO(dd),dots=(state.plan[day]||[]).map(x=>`<span class="dot ${cls(adjusted(x).type)}"></span>`).join(''),sel=iso===state.selectedDate?' selected':'',tod=iso===todayISO()?' todayCell':'';html+=`<div class="calday${sel}${tod}" onclick="selectDate('${iso}')"><div class="calnum">${n}</div>${dots}</div>`}calendarGrid.innerHTML=html;renderSelected();renderWeekView()}
+function renderSelected(){let d=new Date(state.selectedDate+'T00:00:00'),day=days[d.getDay()];selectedTitle.textContent=d.toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'});selectedSub.textContent=`${(state.plan[day]||[]).length} planned workouts`;selectedWorkouts.innerHTML=(state.plan[day]||[]).map((x,i)=>workoutHTML(day,x,i,false)).join('')||'<div class="note">No planned workouts.</div>'}
+function renderWeekView(){let base=weekStart();base.setDate(base.getDate()+state.weekOffset*7);let end=new Date(base);end.setDate(end.getDate()+6);weekTitle.textContent=base.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' – '+end.toLocaleDateString(undefined,{month:'short',day:'numeric'});weekStrip.innerHTML='';let html='';for(let i=0;i<7;i++){let d=new Date(base);d.setDate(base.getDate()+i);let day=days[d.getDay()],iso=dateISO(d),sel=iso===state.selectedDate?' selected':'';weekStrip.innerHTML+=`<div class="weekDay${sel}" onclick="selectDate('${iso}')"><b>${day.slice(0,3)}</b><br>${d.getDate()}</div>`;html+=`<div class="card"><div class="dayHead"><div><div class="kicker">${day}</div><div class="small">${d.toLocaleDateString(undefined,{month:'short',day:'numeric'})}</div></div>${iso===todayISO()?'<span class="today">TODAY</span>':''}</div>${(state.plan[day]||[]).map((x,j)=>workoutHTML(day,x,j,false)).join('')}</div>`}weekView.innerHTML=html}
+function saveLog(){state.logs.push({date:date.value||todayISO(),sport:sport.value,dist:Number(dist.value||0),mins:Number(mins.value||0),hr:Number(hr.value||0)||'',rpe:Number(rpe.value||0)||'',notes:notes.value});['dist','mins','hr','rpe','notes'].forEach(id=>document.getElementById(id).value='');save();show('home')}
+function renderLogs(){date.value=date.value||todayISO();logs.innerHTML=[...state.logs].reverse().slice(0,10).map((x,ri)=>{let i=state.logs.length-1-ri;return `<div class="workout"><div class="row between"><div><span class="type ${x.sport}">${x.sport}</span> <b>${x.date}</b></div><button class="mini bad" onclick="state.logs.splice(${i},1);save()">delete</button></div><div class="desc">${x.dist||''}${x.sport==='Swim'?' yd':' mi'} ${x.mins?'• '+x.mins+' min':''} ${x.hr?'• HR '+x.hr:''} ${x.rpe?'• RPE '+x.rpe:''}</div>${x.notes?'<div class="small">'+x.notes+'</div>':''}</div>`}).join('')}
+function renderStats(){let max=s=>Math.max(0,...state.logs.filter(x=>x.sport===s).map(x=>Number(x.dist||0))),bt=Math.max(0,...state.logs.filter(x=>x.sport==='Bike').map(x=>Number(x.mins||0)));lswim.textContent=Math.round(max('Swim'));lbike.textContent=max('Bike').toFixed(1).replace('.0','');lrun.textContent=max('Run').toFixed(1).replace('.0','');ltime.textContent=Math.round(bt);let pts=0,why=[];if(max('Swim')>=1300){pts++;why.push('swim continuity proven')}if(max('Bike')>=20){pts++;why.push('20+ bike proven')}if(max('Run')>=6.2){pts++;why.push('10K dawg confirmed')}if(bt>=90){pts++;why.push('saddle time adapting')}if(state.logs.filter(x=>thisWeek(x.date)&&x.sport==='PT').length>=2){pts++;why.push('PT insurance paid')}status.textContent=pts>=4?'CERTIFIED DAWG':pts>=2?'DAWG IN PROGRESS':'BUILDING THE DAWG';statusWhy.textContent=why.join(' • ')||'Log workouts to build evidence.'}
+function render(){renderHome();renderPlan();renderCalendar();renderLogs();renderStats()}
+render()
+</script></body></html>
